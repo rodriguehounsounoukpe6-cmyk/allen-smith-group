@@ -37,17 +37,29 @@ class Article(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     titre = db.Column(db.String(200), nullable=False)
     contenu = db.Column(db.Text, nullable=False)
-    # ✅ NOUVEAU CHAMP POUR L'IMAGE
-    image_url = db.Column(db.String(500), nullable=True) 
+    image_url = db.Column(db.String(500), nullable=True)
     date = db.Column(db.DateTime, default=datetime.utcnow)
+
+# ✅ CORRECTION : Ajout de la table des Commentaires
+class Comment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    auteur = db.Column(db.String(100), nullable=False)
+    contenu = db.Column(db.Text, nullable=False)
+    date = db.Column(db.DateTime, default=datetime.utcnow)
+    article_id = db.Column(db.Integer, db.ForeignKey('article.id'), nullable=False)
+    article = db.relationship('Article', backref=db.backref('comments', lazy=True))
 
 class ClientLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date_connexion = db.Column(db.DateTime, default=datetime.utcnow)
 
-# --- CRÉATION DES TABLES ---
+# ✅ CORRECTION : Script pour forcer le nettoyage de la base sur Render
 with app.app_context():
+    if os.path.exists('site.db'):
+        os.remove('site.db')
+        print("Ancienne base de données supprimée avec succès !")
     db.create_all()
+    print("Nouvelle base de données créée avec succès !")
 
 # --- PAGES PUBLIQUES ---
 @app.route('/')
@@ -99,6 +111,7 @@ def user(username):
 # --- PARTIE CONNEXION UNIQUE ---
 ADMIN_PASSWORD = "Allen2026" 
 CLIENT_PASSWORD = "Client2026"
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if session.get('admin_logged_in'):
@@ -139,7 +152,7 @@ def admin():
                            total_connexions=total_connexions, 
                            dernieres_connexions=dernieres_connexions)
 
-@app.route('/admin/new_article', methods=['GET', 'POST'])
+# ✅ CORRECTION : Une seule ligne de décorateur ici !
 @app.route('/admin/new_article', methods=['GET', 'POST'])
 def new_article():
     if not session.get('admin_logged_in'):
@@ -148,7 +161,6 @@ def new_article():
     if request.method == 'POST':
         titre = request.form.get('titre')
         contenu = request.form.get('contenu')
-        # ✅ NOUVEAU : On récupère le lien de l'image
         image_url = request.form.get('image_url')
         
         nouvel_article = Article(titre=titre, contenu=contenu, image_url=image_url)
@@ -186,6 +198,19 @@ def delete_article(id):
     db.session.commit()
     return redirect(url_for('admin'))
 
+# ✅ AJOUT : Route pour recevoir les commentaires
+@app.route('/article/<int:id>/comment', methods=['POST'])
+def add_comment(id):
+    article = Article.query.get_or_404(id)
+    auteur = request.form.get('auteur')
+    contenu = request.form.get('contenu')
+    
+    nouveau_commentaire = Comment(auteur=auteur, contenu=contenu, article=article)
+    db.session.add(nouveau_commentaire)
+    db.session.commit()
+    
+    return redirect(url_for('article_detail', id=id))
+
 # --- HISTORIQUE CLIENT ---
 @app.route('/client_messages')
 def client_messages():
@@ -213,6 +238,6 @@ def logout():
     session.pop('client_logged_in', None)
     return redirect(url_for('home'))
 
-# --- LANCEMENT DU SERVEUR (SANS DEBUG POUR LA PRODUCTION) ---
+# --- LANCEMENT DU SERVEUR ---
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
