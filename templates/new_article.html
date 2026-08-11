@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3>✍️ Publier un nouvel article</h3>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label">Titre de l'article</label>
+                    <input type="text" name="titre" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Contenu de l'article</label>
+                    <textarea name="contenu" class="form-control" rows="8" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-success">Publier l'article</button>
+                <a href="/admin" class="btn btn-secondary">Annuler</a>
+            </form>
+        </div>
+    </div>
+{% endblock %}

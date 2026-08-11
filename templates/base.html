@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Allen Smith Group | {{ titre }}</title>
+    
+    <!-- On importe Bootstrap (pour le CSS et le design pro) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Petites modifications personnelles pour parfaire le design -->
+    <style>
+        body { background-color: #f8f9fa; }
+        .hero-section { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 80px 0; border-radius: 0 0 20px 20px; margin-bottom: 40px; }
+        .navbar-brand { font-weight: bold; font-size: 1.5rem; }
+        .card { border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.2s; }
+        .card:hover { transform: translateY(-5px); }
+        footer { background-color: #1e3c72; color: white; padding: 20px 0; margin-top: 60px; }
+    </style>
+</head>
+<body>
+
+    <!-- MENU DE NAVIGATION MODERNE (Avec Bootstrap) -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #1e3c72;">
+        <div class="container">
+            <a class="navbar-brand" href="/">🏢 Allen Smith Group</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Accueil</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/about">À propos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/blog">Actualités</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/contact">Contact</a></li>
+                    
+                    <!-- LOGIQUE DE MENU CONDITIONNEL (ADMIN vs CLIENT) -->
+                    {% if session.get('admin_logged_in') %}
+                        <!-- Si l'Admin est connecté, il voit le bouton Admin -->
+                        <li class="nav-item"><a class="nav-link btn btn-outline-light btn-sm ms-2" href="/admin">Admin</a></li>
+                    
+                    {% elif session.get('client_logged_in') %}
+                        <!-- Si le Client est connecté, il voit son Espace Client -->
+                        <li class="nav-item"><a class="nav-link btn btn-outline-success btn-sm ms-2" href="/client_dashboard">Espace Client</a></li>
+                    
+                    {% else %}
+                        <!-- Si personne n'est connecté, on affiche le bouton de Connexion Unique -->
+                        <li class="nav-item"><a class="nav-link btn btn-outline-light btn-sm ms-2" href="/login">Connexion</a></li>
+                    {% endif %}
+                    
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- CONTENU PRINCIPAL -->
+    <div class="container mt-4">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- PIED DE PAGE -->
+    <footer class="text-center">
+        <p class="mb-0">&copy; 2026 Allen Smith Group. Tous droits réservés.</p>
+    </footer>
+
+    <!-- Scripts Bootstrap pour le menu mobile -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

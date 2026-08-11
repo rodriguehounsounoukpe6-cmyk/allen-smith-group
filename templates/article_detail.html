@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-body">
+            <h1>{{ article.titre }}</h1>
+            <p class="text-muted small">Publié le {{ article.date.strftime('%d/%m/%Y à %H:%M') }}</p>
+            <hr>
+            <p>{{ article.contenu }}</p>
+            <br>
+            <a href="/blog" class="btn btn-secondary">⬅ Retour aux actualités</a>
+        </div>
+    </div>
+{% endblock %}

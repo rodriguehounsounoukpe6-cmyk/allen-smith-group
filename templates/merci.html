@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <div class="card p-5 shadow-lg" style="border-top: 5px solid #1e3c72;">
+                <h1 style="font-size: 4rem; color: #1e3c72;">✅</h1>
+                <h2 class="mb-3">Merci, {{ nom }} !</h2>
+                <p class="lead text-muted">Votre message a bien été reçu par l'équipe <strong>Allen Smith Group</strong>.</p>
+                <p>Nous vous répondrons dans les plus brefs délais.</p>
+                <hr class="my-4">
+                <a href="/" class="btn btn-primary btn-lg">Retour à l'accueil</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

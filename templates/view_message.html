@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            
+            <div class="card border-info mb-4">
+                <div class="card-header bg-info text-white">
+                    <h3>📩 Message de {{ message.nom }}</h3>
+                </div>
+                <div class="card-body">
+                    <p><strong>Email :</strong> {{ message.email }}</p>
+                    <p><strong>Date :</strong> {{ message.date.strftime('%d/%m/%Y à %H:%M') }}</p>
+                    <hr>
+                    
+                    <h5>Contenu du message :</h5>
+                    <div class="p-3 bg-light rounded border" style="white-space: pre-wrap;">
+                        {{ message.contenu }}
+                    </div>
+                    
+                    <div class="mt-4">
+                        <a href="/admin" class="btn btn-secondary">⬅ Retour au tableau de bord</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulaire pour répondre -->
+            <div class="card mt-4">
+                <div class="card-header bg-success text-white">
+                    <h4>✉️ Répondre à {{ message.nom }}</h4>
+                </div>
+                <div class="card-body">
+                    {% if reponse_envoye %}
+                        <div class="alert alert-success">Votre réponse a été envoyée !</div>
+                    {% endif %}
+                    
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="reponse" class="form-label">Votre réponse :</label>
+                            <textarea class="form-control" id="reponse" name="reponse" rows="6" required placeholder="Écrivez ici votre réponse au client..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success">Envoyer la réponse par email</button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
