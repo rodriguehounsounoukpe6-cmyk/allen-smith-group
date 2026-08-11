@@ -4,6 +4,11 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message as MailMessage
 from datetime import datetime
 
+# --- NOUVEAU : Imports pour Cloudinary ---
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
 app = Flask(__name__)
 
 # CONFIGURATION
@@ -19,6 +24,13 @@ app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', 'votre.email@gmail.com')
 app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'votre_mot_de_passe_app')
+
+# --- NOUVEAU : Configuration Cloudinary ---
+cloudinary.config(
+    cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    api_key = os.environ.get('CLOUDINARY_API_KEY'),
+    api_secret = os.environ.get('CLOUDINARY_API_SECRET')
+)
 
 db = SQLAlchemy(app)
 mail = Mail(app)
@@ -40,7 +52,7 @@ class Article(db.Model):
     image_url = db.Column(db.String(500), nullable=True)
     date = db.Column(db.DateTime, default=datetime.utcnow)
 
-# ✅ Table des commentaires
+# Table des commentaires
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     auteur = db.Column(db.String(100), nullable=False)
@@ -53,7 +65,7 @@ class ClientLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date_connexion = db.Column(db.DateTime, default=datetime.utcnow)
 
-# ✅ Nettoyage forcé au démarrage
+# Nettoyage forcé au démarrage
 with app.app_context():
     if os.path.exists('site.db'):
         os.remove('site.db')
@@ -152,7 +164,7 @@ def admin():
                            total_connexions=total_connexions, 
                            dernieres_connexions=dernieres_connexions)
 
-# ✅ Route unique (pas de doublon)
+# --- NOUVEAU : Fonction modifiée pour l'upload d'images ---
 @app.route('/admin/new_article', methods=['GET', 'POST'])
 def new_article():
     if not session.get('admin_logged_in'):
@@ -161,7 +173,18 @@ def new_article():
     if request.method == 'POST':
         titre = request.form.get('titre')
         contenu = request.form.get('contenu')
-        image_url = request.form.get('image_url')
+        
+        # Gestion de l'upload de l'image
+        image_url = None
+        if 'image' in request.files:
+            file = request.files['image']
+            if file and file.filename != '':
+                try:
+                    upload_result = cloudinary.uploader.upload(file)
+                    image_url = upload_result['secure_url']
+                    print(f"✅ Image uploadée avec succès : {image_url}")
+                except Exception as e:
+                    print(f"❌ Erreur upload image : {e}")
         
         nouvel_article = Article(titre=titre, contenu=contenu, image_url=image_url)
         db.session.add(nouvel_article)
@@ -198,7 +221,7 @@ def delete_article(id):
     db.session.commit()
     return redirect(url_for('admin'))
 
-# ✅ Route pour les commentaires
+# Route pour les commentaires
 @app.route('/article/<int:id>/comment', methods=['POST'])
 def add_comment(id):
     article = Article.query.get_or_404(id)

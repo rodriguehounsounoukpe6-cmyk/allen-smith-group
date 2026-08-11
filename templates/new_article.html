@@ -6,7 +6,8 @@
             <h3>✍️ Publier un nouvel article</h3>
         </div>
         <div class="card-body">
-            <form method="POST">
+            <!-- ✅ IMPORTANT : Ajout de enctype="multipart/form-data" pour l'upload -->
+            <form method="POST" enctype="multipart/form-data">
                 <div class="mb-3">
                     <label class="form-label">Titre de l'article</label>
                     <input type="text" name="titre" class="form-control" required>
@@ -16,11 +17,11 @@
                     <textarea name="contenu" class="form-control" rows="8" required></textarea>
                 </div>
 
-                <!-- ✅ Champ pour l'URL de l'image -->
+                <!-- ✅ NOUVEAU : Champ pour UPLOADER une image depuis l'ordinateur -->
                 <div class="mb-3">
-                    <label for="image_url" class="form-label">Lien de l'image (URL)</label>
-                    <input type="text" class="form-control" id="image_url" name="image_url" placeholder="https://exemple.com/mon-image.jpg">
-                    <small class="text-muted">https://share.google/WJZ6QW2OAepGoM1Y1.</small>
+                    <label for="image" class="form-label">Choisir une image (depuis votre ordinateur)</label>
+                    <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                    <small class="text-muted">Sélectionnez un fichier image (.jpg, .png, .gif).</small>
                 </div>
 
                 <button type="submit" class="btn btn-success">Publier l'article</button>
