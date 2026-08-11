@@ -4,7 +4,7 @@
     <div class="card">
         <div class="card-body">
             
-            <!-- ✅ NOUVEAU : Image en grand au début de l'article -->
+            <!-- Image de l'article -->
             {% if article.image_url %}
                 <img src="{{ article.image_url }}" class="img-fluid mb-4 rounded" alt="{{ article.titre }}">
             {% endif %}
@@ -15,6 +15,45 @@
             <p>{{ article.contenu }}</p>
             <br>
             <a href="/blog" class="btn btn-secondary">⬅ Retour aux actualités</a>
+        </div>
+    </div>
+
+    <br>
+    
+    <!-- SECTION COMMENTAIRES -->
+    <div class="card">
+        <div class="card-header bg-light">
+            <h4>💬 Commentaires ({{ article.comments|length }})</h4>
+        </div>
+        <div class="card-body">
+            
+            <!-- Liste des commentaires existants -->
+            {% for comment in article.comments %}
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <strong>{{ comment.auteur }}</strong> 
+                        <small class="text-muted">- {{ comment.date.strftime('%d/%m/%Y à %H:%M') }}</small>
+                        <p class="mt-2 mb-0">{{ comment.contenu }}</p>
+                    </div>
+                </div>
+            {% else %}
+                <p class="text-muted">Soyez le premier à commenter cet article !</p>
+            {% endfor %}
+
+            <hr>
+            
+            <!-- Formulaire pour ajouter un commentaire -->
+            <h5>Ajouter un commentaire</h5>
+            <form method="POST" action="/article/{{ article.id }}/comment">
+                <div class="mb-2">
+                    <input type="text" name="auteur" class="form-control" placeholder="Votre nom" required>
+                </div>
+                <div class="mb-2">
+                    <textarea name="contenu" class="form-control" rows="3" placeholder="Votre commentaire..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">Publier le commentaire</button>
+            </form>
+            
         </div>
     </div>
 {% endblock %}

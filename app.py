@@ -37,6 +37,8 @@ class Article(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     titre = db.Column(db.String(200), nullable=False)
     contenu = db.Column(db.Text, nullable=False)
+    # ✅ NOUVEAU CHAMP POUR L'IMAGE
+    image_url = db.Column(db.String(500), nullable=True) 
     date = db.Column(db.DateTime, default=datetime.utcnow)
 
 class ClientLog(db.Model):
@@ -97,7 +99,6 @@ def user(username):
 # --- PARTIE CONNEXION UNIQUE ---
 ADMIN_PASSWORD = "Allen2026" 
 CLIENT_PASSWORD = "Client2026"
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if session.get('admin_logged_in'):
@@ -139,6 +140,7 @@ def admin():
                            dernieres_connexions=dernieres_connexions)
 
 @app.route('/admin/new_article', methods=['GET', 'POST'])
+@app.route('/admin/new_article', methods=['GET', 'POST'])
 def new_article():
     if not session.get('admin_logged_in'):
         return redirect(url_for('login'))
@@ -146,7 +148,10 @@ def new_article():
     if request.method == 'POST':
         titre = request.form.get('titre')
         contenu = request.form.get('contenu')
-        nouvel_article = Article(titre=titre, contenu=contenu)
+        # ✅ NOUVEAU : On récupère le lien de l'image
+        image_url = request.form.get('image_url')
+        
+        nouvel_article = Article(titre=titre, contenu=contenu, image_url=image_url)
         db.session.add(nouvel_article)
         db.session.commit()
         return redirect(url_for('admin'))
