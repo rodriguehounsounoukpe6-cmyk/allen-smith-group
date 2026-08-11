@@ -40,7 +40,7 @@ class Article(db.Model):
     image_url = db.Column(db.String(500), nullable=True)
     date = db.Column(db.DateTime, default=datetime.utcnow)
 
-# ✅ CORRECTION : Ajout de la table des Commentaires
+# ✅ Table des commentaires
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     auteur = db.Column(db.String(100), nullable=False)
@@ -53,7 +53,7 @@ class ClientLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date_connexion = db.Column(db.DateTime, default=datetime.utcnow)
 
-# ✅ CORRECTION : Script pour forcer le nettoyage de la base sur Render
+# ✅ Nettoyage forcé au démarrage
 with app.app_context():
     if os.path.exists('site.db'):
         os.remove('site.db')
@@ -152,7 +152,7 @@ def admin():
                            total_connexions=total_connexions, 
                            dernieres_connexions=dernieres_connexions)
 
-# ✅ CORRECTION : Une seule ligne de décorateur ici !
+# ✅ Route unique (pas de doublon)
 @app.route('/admin/new_article', methods=['GET', 'POST'])
 def new_article():
     if not session.get('admin_logged_in'):
@@ -198,7 +198,7 @@ def delete_article(id):
     db.session.commit()
     return redirect(url_for('admin'))
 
-# ✅ AJOUT : Route pour recevoir les commentaires
+# ✅ Route pour les commentaires
 @app.route('/article/<int:id>/comment', methods=['POST'])
 def add_comment(id):
     article = Article.query.get_or_404(id)

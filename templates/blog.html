@@ -8,7 +8,7 @@
                 <div class="col-md-6 mb-4">
                     <div class="card h-100">
                         
-                        <!-- ✅ NOUVEAU : Affichage de l'image si elle existe -->
+                        <!-- ✅ Image de l'article si elle existe -->
                         {% if article.image_url %}
                             <img src="{{ article.image_url }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="{{ article.titre }}">
                         {% endif %}

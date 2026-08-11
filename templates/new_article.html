@@ -15,6 +15,14 @@
                     <label class="form-label">Contenu de l'article</label>
                     <textarea name="contenu" class="form-control" rows="8" required></textarea>
                 </div>
+
+                <!-- ✅ Champ pour l'URL de l'image -->
+                <div class="mb-3">
+                    <label for="image_url" class="form-label">Lien de l'image (URL)</label>
+                    <input type="text" class="form-control" id="image_url" name="image_url" placeholder="https://exemple.com/mon-image.jpg">
+                    <small class="text-muted">https://share.google/WJZ6QW2OAepGoM1Y1.</small>
+                </div>
+
                 <button type="submit" class="btn btn-success">Publier l'article</button>
                 <a href="/admin" class="btn btn-secondary">Annuler</a>
             </form>
