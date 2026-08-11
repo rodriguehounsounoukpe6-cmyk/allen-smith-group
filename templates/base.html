@@ -28,6 +28,19 @@
         .card { border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.2s; }
         .card:hover { transform: translateY(-5px); }
         footer { background-color: #1e3c72; color: white; padding: 20px 0; margin-top: 60px; }
+
+        /* ✅ STYLE POUR LE BADGE DE NOTIFICATION */
+        .notification-badge {
+            position: relative;
+            top: -10px;
+            left: -5px;
+            padding: 3px 7px;
+            border-radius: 50%;
+            background-color: #dc3545;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -48,8 +61,19 @@
                     
                     <!-- LOGIQUE DE MENU CONDITIONNEL (ADMIN vs CLIENT) -->
                     {% if session.get('admin_logged_in') %}
-                        <!-- Si l'Admin est connecté, il voit le bouton Admin -->
-                        <li class="nav-item"><a class="nav-link btn btn-outline-light btn-sm ms-2" href="/admin">Admin</a></li>
+                        <!-- Si l'Admin est connecté, il voit le bouton Admin avec le badge -->
+                        <li class="nav-item">
+                            <a class="nav-link btn btn-outline-light btn-sm ms-2 position-relative" href="/admin">
+                                Admin
+                                <!-- ✅ BADGE ROUGE DE NOTIFICATION -->
+                                {% if unread_count and unread_count > 0 %}
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.7rem;">
+                                        {{ unread_count }}
+                                        <span class="visually-hidden">messages non lus</span>
+                                    </span>
+                                {% endif %}
+                            </a>
+                        </li>
                     
                     {% elif session.get('client_logged_in') %}
                         <!-- Si le Client est connecté, il voit son Espace Client -->
