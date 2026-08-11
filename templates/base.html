@@ -11,7 +11,19 @@
     <!-- Petites modifications personnelles pour parfaire le design -->
     <style>
         body { background-color: #f8f9fa; }
-        .hero-section { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 80px 0; border-radius: 0 0 20px 20px; margin-bottom: 40px; }
+        
+        /* NOUVELLE BANNIÈRE AVEC IMAGE DE FOND */
+        .hero-section { 
+            background: linear-gradient(rgba(30, 60, 114, 0.7), rgba(42, 82, 152, 0.7)), 
+                        url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&q=80&w=1200'); 
+            background-size: cover; 
+            background-position: center; 
+            color: white; 
+            padding: 100px 0; 
+            border-radius: 0 0 20px 20px; 
+            margin-bottom: 40px; 
+        }
+        
         .navbar-brand { font-weight: bold; font-size: 1.5rem; }
         .card { border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.2s; }
         .card:hover { transform: translateY(-5px); }
