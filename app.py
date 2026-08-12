@@ -72,13 +72,15 @@ class ClientLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date_connexion = db.Column(db.DateTime, default=datetime.utcnow)
 
-# Nettoyage forcé au démarrage
+# ✅ SCRIPT DE NETTOYAGE AGRESSIF AU DÉMARRAGE
 with app.app_context():
+    # On supprime le fichier de la base de données s'il existe
     if os.path.exists('site.db'):
         os.remove('site.db')
-        print("Ancienne base de données supprimée avec succès !")
+        print("🔴 Ancienne base de données supprimée avec succès !")
+    # On recrée la base avec toutes les colonnes
     db.create_all()
-    print("Nouvelle base de données créée avec succès !")
+    print("🟢 Nouvelle base de données créée avec succès !")
 
 # --- PAGES PUBLIQUES ---
 @app.route('/')
