@@ -35,4 +35,53 @@
             </div>
         </div>
     </div>
+
+    <hr class="my-5">
+
+    <!-- Section : Dernières actualités -->
+    <h2 class="text-center mb-4">📰 Dernières actualités</h2>
+    <div class="row">
+        {% for article in articles[:3] %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    {% if article.image_url %}
+                        <img src="{{ article.image_url }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="{{ article.titre }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ article.titre }}</h5>
+                        <p class="card-text">{{ article.contenu[:100] }}...</p>
+                        <a href="/article/{{ article.id }}" class="btn btn-outline-primary btn-sm">Lire la suite</a>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12 text-center">
+                <p>Aucun article publié pour le moment.</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <hr class="my-5">
+
+    <!-- Section : Derniers médias (Bibliothèque) -->
+    <h2 class="text-center mb-4">📁 Nos derniers médias</h2>
+    <div class="row">
+        {% for media in medias[:3] %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ media.titre }}</h5>
+                        <p class="text-muted small">{{ media.type_fichier|upper }}</p>
+                        <a href="{{ media.url_fichier }}" class="btn btn-success btn-sm" target="_blank" download>
+                            Télécharger
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12 text-center">
+                <p>Aucun média publié pour le moment.</p>
+            </div>
+        {% endfor %}
+    </div>
 {% endblock %}

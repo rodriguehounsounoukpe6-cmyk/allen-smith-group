@@ -83,7 +83,16 @@ with app.app_context():
 # --- PAGES PUBLIQUES ---
 @app.route('/')
 def home():
-    return render_template('index.html', titre="Accueil - Allen Smith Group", meta_description="Découvrez Allen Smith Group, votre partenaire pour vos projets web et technologiques.")
+    # On récupère les 3 derniers articles
+    articles = Article.query.order_by(Article.date.desc()).limit(3).all()
+    # On récupère les 3 derniers médias
+    medias = Media.query.order_by(Media.date.desc()).limit(3).all()
+    
+    return render_template('index.html', 
+                           titre="Accueil - Allen Smith Group", 
+                           meta_description="Découvrez Allen Smith Group, votre partenaire pour vos projets web et technologiques.",
+                           articles=articles,
+                           medias=medias)
 
 @app.route('/about')
 def about():

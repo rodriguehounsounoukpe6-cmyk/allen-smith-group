@@ -36,7 +36,7 @@
             <hr>
             <!-- --- FIN STATISTIQUES --- -->
 
-                        <!-- Section Articles -->
+            <!-- Section Articles -->
             <h4 class="mt-3">📰 Gestion des actualités</h4>
             <a href="/admin/new_article" class="btn btn-primary btn-sm mb-3">➕ Publier un nouvel article</a>
             
@@ -48,7 +48,6 @@
                                 {{ art.titre }}
                                 <span class="badge bg-secondary rounded-pill">{{ art.date.strftime('%d/%m') }}</span>
                             </div>
-                            <!-- NOUVEAU : BOUTON SUPPRIMER -->
                             <a href="/admin/delete_article/{{ art.id }}" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?')">🗑️ Supprimer</a>
                         </li>
                     {% endfor %}
@@ -56,8 +55,15 @@
             {% else %}
                 <p class="text-muted">Aucun article publié.</p>
             {% endif %}
+            
+            <!-- ✅ NOUVEAU : Section Médias -->
+            <h4 class="mt-3">📁 Gestion des médias</h4>
+            <a href="/admin/new_media" class="btn btn-success btn-sm mb-3">➕ Publier un nouveau média</a>
+            <p class="text-muted small">Publiez ici des images ou des PDF qui apparaîtront dans la Bibliothèque.</p>
 
-            <!-- Section Messages (AVEC LE NOUVEAU SYSTÈME DE STATUT) -->
+            <hr>
+
+            <!-- Section Messages -->
             <h4>💬 Derniers messages reçus</h4>
             {% if messages %}
                 <div class="table-responsive">
@@ -67,7 +73,7 @@
                                 <th>Date</th>
                                 <th>Nom</th>
                                 <th>Email</th>
-                                <th>Statut</th> <!-- Nouvelle colonne Statut -->
+                                <th>Statut</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -78,7 +84,6 @@
                                 <td>{{ msg.nom }}</td>
                                 <td>{{ msg.email }}</td>
                                 <td>
-                                    <!-- Affichage du statut avec une couleur différente -->
                                     {% if msg.statut == "Non lu" %}
                                         <span class="badge bg-danger">{{ msg.statut }}</span>
                                     {% elif msg.statut == "En cours" %}
