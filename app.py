@@ -83,9 +83,7 @@ with app.app_context():
 # --- PAGES PUBLIQUES ---
 @app.route('/')
 def home():
-    # On récupère les 3 derniers articles
     articles = Article.query.order_by(Article.date.desc()).limit(3).all()
-    # On récupère les 3 derniers médias
     medias = Media.query.order_by(Media.date.desc()).limit(3).all()
     
     return render_template('index.html', 
@@ -194,9 +192,7 @@ def admin():
     unread_count = Message.query.filter_by(statut="Non lu").count()
     
     return render_template('admin.html', titre="Administration", 
-                           messages=messages, 
-                           articles=articles, 
-                           medias=medias,
+                           messages=messages, articles=articles, medias=medias,
                            total_connexions=total_connexions, 
                            dernieres_connexions=dernieres_connexions,
                            unread_count=unread_count)
@@ -284,10 +280,6 @@ def new_media():
         
     return render_template('new_media.html', titre="Publier un média")
 
-@app.route('/legal')
-def legal():
-    return render_template('legal.html', titre="Mentions légales")
-
 @app.route('/article/<int:id>/comment', methods=['POST'])
 def add_comment(id):
     article = Article.query.get_or_404(id)
@@ -300,19 +292,10 @@ def add_comment(id):
     
     return redirect(url_for('article_detail', id=id))
 
-@app.route('/testimonials')
-def testimonials():
-    return render_template('testimonials.html', titre="Témoignages")
-
-@app.route('/faq')
-def faq():
-    return render_template('faq.html', titre="FAQ")
-
 @app.route('/media_library')
 def media_library():
     medias = Media.query.order_by(Media.date.desc()).all()
     return render_template('media_library.html', titre="Bibliothèque", medias=medias)
-
 
 @app.route('/client_messages')
 def client_messages():
