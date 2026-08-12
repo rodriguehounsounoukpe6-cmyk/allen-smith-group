@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="card p-4">
+        <h2>❓ Foire Aux Questions (FAQ)</h2>
+        <hr>
+        <div class="accordion" id="faqAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        Quels services proposez-vous ?
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">Nous proposons du développement web sur mesure (Flask, Python), du design UI/UX, et des solutions technologiques pour les entreprises.</div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingTwo">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                        Comment puis-je vous contacter ?
+                    </button>
+                </h2>
+                <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">Utilisez le formulaire de contact, ou envoyez un email à <a href="mailto:allsmithentreprise6@gmail.com">allsmithentreprise6@gmail.com</a>.</div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingThree">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                        Est-ce que mes données sont sécurisées ?
+                    </button>
+                </h2>
+                <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">Oui ! Conformément au RGPD, vos données ne sont jamais partagées et sont utilisées uniquement pour répondre à vos demandes.</div>
+                </div>
+            </div>
+        </div>
+        <a href="/" class="btn btn-secondary mt-4">Retour à l'accueil</a>
+    </div>
+{% endblock %}

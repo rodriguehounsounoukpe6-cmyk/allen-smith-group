@@ -79,6 +79,10 @@
                     
                     <!-- ✅ NOUVEAU : LIEN VERS LA BIBLIOTHÈQUE DE MÉDIAS -->
                     <li class="nav-item"><a class="nav-link" href="/media_library">📁 Bibliothèque</a></li>
+
+                    <!-- ✅ NOUVEAU : LIENS FAQ ET TÉMOIGNAGES -->
+                    <li class="nav-item"><a class="nav-link" href="/faq">❓ FAQ</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/testimonials">⭐ Témoignages</a></li>
                     
                     <!-- LOGIQUE DE MENU CONDITIONNEL (ADMIN vs CLIENT) -->
                     {% if session.get('admin_logged_in') %}
@@ -117,7 +121,15 @@
 
     <!-- PIED DE PAGE -->
     <footer class="text-center">
-        <p class="mb-0">&copy; 2026 Allen Smith Group. Tous droits réservés.</p>
+        <!-- ✅ NOUVEAU : Icônes des réseaux sociaux -->
+        <div class="mb-3">
+            <a href="#" class="text-white mx-2" target="_blank"><i class="fab fa-facebook-f fa-lg"></i></a>
+            <a href="#" class="text-white mx-2" target="_blank"><i class="fab fa-instagram fa-lg"></i></a>
+            <a href="#" class="text-white mx-2" target="_blank"><i class="fab fa-linkedin-in fa-lg"></i></a>
+        </div>
+
+        <!-- ✅ NOUVEAU : Lien vers les mentions légales -->
+        <p class="mb-0">&copy; 2026 Allen Smith Group. Tous droits réservés. | <a href="/legal" class="text-white">Mentions légales</a></p>
     </footer>
 
     <!-- Scripts Bootstrap pour le menu mobile -->

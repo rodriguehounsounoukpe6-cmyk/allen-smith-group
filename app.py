@@ -284,6 +284,10 @@ def new_media():
         
     return render_template('new_media.html', titre="Publier un média")
 
+@app.route('/legal')
+def legal():
+    return render_template('legal.html', titre="Mentions légales")
+
 @app.route('/article/<int:id>/comment', methods=['POST'])
 def add_comment(id):
     article = Article.query.get_or_404(id)
@@ -295,6 +299,10 @@ def add_comment(id):
     db.session.commit()
     
     return redirect(url_for('article_detail', id=id))
+
+@app.route('/testimonials')
+def testimonials():
+    return render_template('testimonials.html', titre="Témoignages")
 
 @app.route('/media_library')
 def media_library():
