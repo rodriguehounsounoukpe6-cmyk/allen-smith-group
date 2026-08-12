@@ -304,6 +304,10 @@ def add_comment(id):
 def testimonials():
     return render_template('testimonials.html', titre="Témoignages")
 
+@app.route('/faq')
+def faq():
+    return render_template('faq.html', titre="FAQ")
+
 @app.route('/media_library')
 def media_library():
     medias = Media.query.order_by(Media.date.desc()).all()
