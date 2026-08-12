@@ -53,6 +53,13 @@ class Article(db.Model):
     image_url = db.Column(db.String(500), nullable=True)
     date = db.Column(db.DateTime, default=datetime.utcnow)
 
+class Media(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    titre = db.Column(db.String(200), nullable=False)
+    type_fichier = db.Column(db.String(50), nullable=False)  # 'image' ou 'pdf'
+    url_fichier = db.Column(db.String(500), nullable=False)
+    date = db.Column(db.DateTime, default=datetime.utcnow)
+
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     auteur = db.Column(db.String(100), nullable=False)
@@ -237,6 +244,34 @@ def delete_article(id):
     db.session.commit()
     return redirect(url_for('admin'))
 
+@app.route('/admin/new_media', methods=['GET', 'POST'])
+def new_media():
+    if not session.get('admin_logged_in'):
+        return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        titre = request.form.get('titre')
+        type_fichier = request.form.get('type_fichier')
+        
+        url_fichier = None
+        if 'fichier' in request.files:
+            file = request.files['fichier']
+            if file and file.filename != '':
+                try:
+                    upload_result = cloudinary.uploader.upload(file, resource_type="auto")
+                    url_fichier = upload_result['secure_url']
+                    print(f"✅ Fichier uploadé avec succès : {url_fichier}")
+                except Exception as e:
+                    print(f"❌ Erreur upload : {e}")
+        
+        if url_fichier:
+            nouveau_media = Media(titre=titre, type_fichier=type_fichier, url_fichier=url_fichier)
+            db.session.add(nouveau_media)
+            db.session.commit()
+            return redirect(url_for('admin'))
+        
+    return render_template('new_media.html', titre="Publier un média")
+
 @app.route('/article/<int:id>/comment', methods=['POST'])
 def add_comment(id):
     article = Article.query.get_or_404(id)
@@ -248,6 +283,12 @@ def add_comment(id):
     db.session.commit()
     
     return redirect(url_for('article_detail', id=id))
+
+@app.route('/media_library')
+def media_library():
+    medias = Media.query.order_by(Media.date.desc()).all()
+    return render_template('media_library.html', titre="Bibliothèque", medias=medias)
+
 
 @app.route('/client_messages')
 def client_messages():

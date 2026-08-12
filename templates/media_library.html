@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2 class="mb-4">📁 Bibliothèque de médias</h2>
+    <div class="row">
+        {% if medias %}
+            {% for media in medias %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">{{ media.titre }}</h5>
+                            <p class="text-muted small">{{ media.type_fichier|upper }}</p>
+                            <a href="{{ media.url_fichier }}" class="btn btn-primary" target="_blank" download>
+                                Télécharger
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <p class="text-muted">Aucun fichier disponible pour le moment.</p>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

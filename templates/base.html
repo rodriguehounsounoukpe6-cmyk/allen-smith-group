@@ -64,6 +64,9 @@
                     <li class="nav-item"><a class="nav-link" href="/blog">Actualités</a></li>
                     <li class="nav-item"><a class="nav-link" href="/contact">Contact</a></li>
                     
+                    <!-- ✅ NOUVEAU : LIEN VERS LA BIBLIOTHÈQUE DE MÉDIAS -->
+                    <li class="nav-item"><a class="nav-link" href="/media_library">📁 Bibliothèque</a></li>
+                    
                     <!-- LOGIQUE DE MENU CONDITIONNEL (ADMIN vs CLIENT) -->
                     {% if session.get('admin_logged_in') %}
                         <!-- Si l'Admin est connecté, il voit le bouton Admin avec le badge -->
