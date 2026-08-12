@@ -15,7 +15,19 @@
     
     <!-- Petites modifications personnelles pour parfaire le design -->
     <style>
-        body { background-color: #f8f9fa; }
+        /* ✅ AJOUT IMPORTANT : Pour que le footer reste toujours en bas */
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            background-color: #f8f9fa;
+        }
+        .container.mt-4 {
+            flex: 1; /* Pousse le footer vers le bas */
+        }
         
         /* NOUVELLE BANNIÈRE AVEC IMAGE DE FOND */
         .hero-section { 
@@ -32,7 +44,8 @@
         .navbar-brand { font-weight: bold; font-size: 1.5rem; }
         .card { border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.2s; }
         .card:hover { transform: translateY(-5px); }
-        footer { background-color: #1e3c72; color: white; padding: 20px 0; margin-top: 60px; }
+        
+        footer { background-color: #1e3c72; color: white; padding: 20px 0; margin-top: auto; }
 
         /* ✅ STYLE POUR LE BADGE DE NOTIFICATION */
         .notification-badge {
