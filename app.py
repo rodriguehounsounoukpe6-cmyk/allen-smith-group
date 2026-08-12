@@ -121,7 +121,7 @@ def contact():
             print(f"Erreur lors de l'envoi de l'email : {e}")
 
         return redirect(url_for('merci', nom=nom))
-
+ 
     return render_template('contact.html', titre="Contact - Allen Smith Group", meta_description="Contactez Allen Smith Group pour vos projets web et technologiques.")
 
 @app.route('/merci')
@@ -240,7 +240,22 @@ def view_message(id):
         reponse_texte = request.form.get('reponse')
         msg.statut = "✅ Traité"
         db.session.commit()
-        return render_template('view_message.html', titre=f"Message de {msg.nom}", message=msg, reponse_envoye=True)
+        
+        # ✅ NOUVEAU : ENVOI DE L'EMAIL DE RÉPONSE AU CLIENT
+        try:
+            msg_reponse = MailMessage(
+                subject='Réponse de Allen Smith Group',
+                sender=app.config['MAIL_DEFAULT_SENDER'],
+                recipients=[msg.email]  # Envoi au client qui a posé la question
+            )
+            msg_reponse.body = f"Bonjour {msg.nom},\n\nVoici la réponse de l'équipe Allen Smith Group à votre message :\n\n{reponse_texte}\n\nCordialement,\nL'équipe Allen Smith Group"
+            mail.send(msg_reponse)
+            reponse_envoye = True
+        except Exception as e:
+            print(f"Erreur lors de l'envoi de la réponse : {e}")
+            reponse_envoye = False
+        
+        return render_template('view_message.html', titre=f"Message de {msg.nom}", message=msg, reponse_envoye=reponse_envoye)
     
     return render_template('view_message.html', titre=f"Message de {msg.nom}", message=msg)
 
