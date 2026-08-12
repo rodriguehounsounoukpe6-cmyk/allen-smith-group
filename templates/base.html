@@ -41,7 +41,6 @@
             margin-bottom: 40px; 
         }
         
-        .navbar-brand { font-weight: bold; font-size: 1.5rem; }
         .card { border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.2s; }
         .card:hover { transform: translateY(-5px); }
         
@@ -66,7 +65,10 @@
     <!-- MENU DE NAVIGATION MODERNE (Avec Bootstrap) -->
     <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #1e3c72;">
         <div class="container">
-            <a class="navbar-brand" href="/">🏢 Allen Smith Group</a>
+            <!-- ✅ REMPLACÉ PAR LE LOGO -->
+            <a class="navbar-brand" href="/">
+                <img src="/static/logo.png" alt="Allen Smith Group" style="height: 45px;">
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
