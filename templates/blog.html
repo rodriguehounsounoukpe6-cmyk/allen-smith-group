@@ -2,6 +2,19 @@
 
 {% block content %}
     <h2 class="mb-4">📰 Nos dernières actualités</h2>
+
+    <!-- ✅ Barre de recherche ajoutée ici -->
+    <div class="row mb-4">
+        <div class="col-md-6 offset-md-3">
+            <form method="GET" action="/blog">
+                <div class="input-group">
+                    <input type="text" class="form-control" name="q" placeholder="Rechercher un article..." value="{{ search_query if search_query else '' }}">
+                    <button class="btn btn-primary" type="submit">🔍 Rechercher</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="row">
         {% if articles %}
             {% for article in articles %}

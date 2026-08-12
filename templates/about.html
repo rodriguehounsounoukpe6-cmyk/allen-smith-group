@@ -1,8 +1,16 @@
 {% extends "base.html" %}
+
 {% block content %}
     <div class="card p-4">
         <h2>À propos de nous</h2>
         <hr>
         <p>Allen Smith Group a été fondé pour offrir des services de développement web professionnels et accessibles. Nous allions design moderne et technologies de pointe (Python, Flask, Bootstrap) pour créer des sites sur mesure.</p>
+        
+        <!-- ✅ NOUVEAU : BOUTON DE TÉLÉCHARGEMENT -->
+        <div class="mt-4">
+            <a href="/download/brochure.pdf" class="btn btn-success btn-lg" download>
+                📄 Télécharger notre brochure (PDF)
+            </a>
+        </div>
     </div>
 {% endblock %}

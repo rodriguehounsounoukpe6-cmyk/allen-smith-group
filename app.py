@@ -1,10 +1,10 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message as MailMessage
 from datetime import datetime
 
-# --- NOUVEAU : Imports pour Cloudinary ---
+# --- Imports pour Cloudinary ---
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
@@ -18,14 +18,15 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Utilisation des variables d'environnement pour la sécurité (Render les gérera)
 app.secret_key = os.environ.get('SECRET_KEY', 'une_cle_tres_secrete_et_compliquee_a_changer')
 
-# CONFIGURATION EMAIL
+# CONFIGURATION EMAIL (Forçage de la langue FR pour les emails)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', 'votre.email@gmail.com')
 app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'votre_mot_de_passe_app')
+app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_USERNAME', 'votre.email@gmail.com')
 
-# --- NOUVEAU : Configuration Cloudinary ---
+# --- Configuration Cloudinary ---
 cloudinary.config(
     cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME'),
     api_key = os.environ.get('CLOUDINARY_API_KEY'),
@@ -52,7 +53,6 @@ class Article(db.Model):
     image_url = db.Column(db.String(500), nullable=True)
     date = db.Column(db.DateTime, default=datetime.utcnow)
 
-# Table des commentaires
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     auteur = db.Column(db.String(100), nullable=False)
@@ -76,11 +76,11 @@ with app.app_context():
 # --- PAGES PUBLIQUES ---
 @app.route('/')
 def home():
-    return render_template('index.html', titre="Accueil - Allen Smith Group")
+    return render_template('index.html', titre="Accueil - Allen Smith Group", meta_description="Découvrez Allen Smith Group, votre partenaire pour vos projets web et technologiques.")
 
 @app.route('/about')
 def about():
-    return render_template('about.html', titre="À propos - Allen Smith Group")
+    return render_template('about.html', titre="À propos - Allen Smith Group", meta_description="Découvrez l'histoire et les valeurs d'Allen Smith Group, votre partenaire technologique de confiance.")
 
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
@@ -94,31 +94,47 @@ def contact():
         db.session.commit()
 
         try:
-            msg = MailMessage('Nouveau message sur Allen Smith Group',
-                              sender=app.config['MAIL_USERNAME'],
-                              recipients=[app.config['MAIL_USERNAME']])
+            msg = MailMessage(
+                subject='Nouveau message sur Allen Smith Group',
+                sender=app.config['MAIL_DEFAULT_SENDER'],
+                recipients=[app.config['MAIL_DEFAULT_SENDER']]
+            )
             msg.body = f"Vous avez reçu un message de {nom} ({email}).\n\nMessage :\n{message_texte}"
             mail.send(msg)
         except Exception as e:
             print(f"Erreur lors de l'envoi de l'email : {e}")
 
-        return render_template('merci.html', titre="Message envoyé", nom=nom)
+        return redirect(url_for('merci', nom=nom))
 
-    return render_template('contact.html', titre="Contact - Allen Smith Group")
+    return render_template('contact.html', titre="Contact - Allen Smith Group", meta_description="Contactez Allen Smith Group pour vos projets web et technologiques.")
+
+@app.route('/merci')
+def merci():
+    nom = request.args.get('nom')
+    return render_template('merci.html', titre="Message envoyé", nom=nom)
 
 @app.route('/blog')
 def blog():
     articles = Article.query.order_by(Article.date.desc()).all()
-    return render_template('blog.html', titre="Actualités - Allen Smith Group", articles=articles)
+    return render_template('blog.html', titre="Actualités - Allen Smith Group", articles=articles, meta_description="Suivez les dernières actualités et innovations d'Allen Smith Group.")
 
 @app.route('/article/<int:id>')
 def article_detail(id):
     article = Article.query.get_or_404(id)
-    return render_template('article_detail.html', titre=article.titre, article=article)
+    return render_template('article_detail.html', titre=article.titre, article=article, meta_description="Lisez notre article : " + article.titre)
 
 @app.route('/user/<username>')
 def user(username):
     return render_template('user.html', titre=f"Profil de {username}", username=username)
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html', titre="Page introuvable"), 404
+
+# --- TÉLÉCHARGEMENT DE FICHIERS (PDF) ---
+@app.route('/download/<filename>')
+def download_file(filename):
+    return send_from_directory('static', filename)
 
 # --- PARTIE CONNEXION UNIQUE ---
 ADMIN_PASSWORD = "Allen2026" 
@@ -158,13 +174,14 @@ def admin():
     articles = Article.query.order_by(Article.date.desc()).all()
     total_connexions = ClientLog.query.count()
     dernieres_connexions = ClientLog.query.order_by(ClientLog.date_connexion.desc()).limit(5).all()
+    unread_count = Message.query.filter_by(statut="Non lu").count()
     
     return render_template('admin.html', titre="Administration", 
                            messages=messages, articles=articles,
                            total_connexions=total_connexions, 
-                           dernieres_connexions=dernieres_connexions)
+                           dernieres_connexions=dernieres_connexions,
+                           unread_count=unread_count)
 
-# --- NOUVEAU : Fonction modifiée pour l'upload d'images ---
 @app.route('/admin/new_article', methods=['GET', 'POST'])
 def new_article():
     if not session.get('admin_logged_in'):
@@ -174,7 +191,6 @@ def new_article():
         titre = request.form.get('titre')
         contenu = request.form.get('contenu')
         
-        # Gestion de l'upload de l'image
         image_url = None
         if 'image' in request.files:
             file = request.files['image']
@@ -221,7 +237,6 @@ def delete_article(id):
     db.session.commit()
     return redirect(url_for('admin'))
 
-# Route pour les commentaires
 @app.route('/article/<int:id>/comment', methods=['POST'])
 def add_comment(id):
     article = Article.query.get_or_404(id)
@@ -234,7 +249,6 @@ def add_comment(id):
     
     return redirect(url_for('article_detail', id=id))
 
-# --- HISTORIQUE CLIENT ---
 @app.route('/client_messages')
 def client_messages():
     if not session.get('client_logged_in'):
@@ -247,20 +261,17 @@ def client_messages():
     
     return render_template('client_messages.html', titre="Mes Messages", messages=messages)
 
-# --- PARTIE CLIENT ---
 @app.route('/client_dashboard')
 def client_dashboard():
     if not session.get('client_logged_in'):
         return redirect(url_for('login'))
     return render_template('client_dashboard.html', titre="Espace Client")
 
-# --- DÉCONNEXION UNIQUE ---
 @app.route('/logout')
 def logout():
     session.pop('admin_logged_in', None)
     session.pop('client_logged_in', None)
     return redirect(url_for('home'))
 
-# --- LANCEMENT DU SERVEUR ---
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
