@@ -188,12 +188,15 @@ def admin():
     
     messages = Message.query.order_by(Message.date.desc()).all()
     articles = Article.query.order_by(Article.date.desc()).all()
+    medias = Media.query.order_by(Media.date.desc()).all()
     total_connexions = ClientLog.query.count()
     dernieres_connexions = ClientLog.query.order_by(ClientLog.date_connexion.desc()).limit(5).all()
     unread_count = Message.query.filter_by(statut="Non lu").count()
     
     return render_template('admin.html', titre="Administration", 
-                           messages=messages, articles=articles,
+                           messages=messages, 
+                           articles=articles, 
+                           medias=medias,
                            total_connexions=total_connexions, 
                            dernieres_connexions=dernieres_connexions,
                            unread_count=unread_count)
