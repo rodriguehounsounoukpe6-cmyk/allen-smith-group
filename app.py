@@ -1,5 +1,6 @@
 import os
 import shutil
+import threading  # <-- AJOUT IMPORTANT
 from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message as MailMessage
@@ -26,8 +27,6 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', 'votre.email@gmail.com')
 app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'votre_mot_de_passe_app')
 app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_USERNAME', 'votre.email@gmail.com')
-# ✅ TIMEOUT PLACÉ ICI (AVANT L'INITIALISATION DE MAIL)
-app.config['MAIL_TIMEOUT'] = 5
 
 # --- Configuration Cloudinary ---
 cloudinary.config(
@@ -115,20 +114,23 @@ def contact():
         db.session.add(nouveau_message)
         db.session.commit()
 
-        try:
-            # ✅ PLUS BESOIN DE REDÉFINIR LE TIMEOUT ICI
-            msg = MailMessage(
-                subject='Nouveau message sur Allen Smith Group',
-                sender=app.config['MAIL_DEFAULT_SENDER'],
-                recipients=[app.config['MAIL_DEFAULT_SENDER']]
-            )
-            msg.body = f"Vous avez reçu un message de {nom} ({email}).\n\nMessage :\n{message_texte}"
-            mail.send(msg) 
-        except Exception as e:
-            # On ignore l'erreur pour que la redirection fonctionne
-            print(f"⚠️ Erreur SMTP (ignore) : {e}")
+        # ✅ ENVOI D'EMAIL EN TÂCHE DE FOND (NE BLOQUE JAMAIS LA PAGE)
+        def send_email_background():
+            try:
+                msg = MailMessage(
+                    subject='Nouveau message sur Allen Smith Group',
+                    sender=app.config['MAIL_DEFAULT_SENDER'],
+                    recipients=[app.config['MAIL_DEFAULT_SENDER']]
+                )
+                msg.body = f"Vous avez reçu un message de {nom} ({email}).\n\nMessage :\n{message_texte}"
+                mail.send(msg)
+            except Exception as e:
+                print(f"⚠️ Erreur SMTP en arrière-plan : {e}")
 
-        # La redirection fonctionnera toujours, même si l'email échoue
+        # Lance l'email dans un thread séparé
+        threading.Thread(target=send_email_background).start()
+
+        # La redirection vers Merci est INSTANTANÉE
         return redirect(url_for('merci', nom=nom))
  
     return render_template('contact.html', titre="Contact - Allen Smith Group", meta_description="Contactez Allen Smith Group pour vos projets web et technologiques.")
@@ -263,20 +265,22 @@ def view_message(id):
         msg.statut = "✅ Traité"
         db.session.commit()
         
-        try:
-            msg_reponse = MailMessage(
-                subject='Réponse de Allen Smith Group',
-                sender=app.config['MAIL_DEFAULT_SENDER'],
-                recipients=[msg.email]
-            )
-            msg_reponse.body = f"Bonjour {msg.nom},\n\nVoici la réponse de l'équipe Allen Smith Group à votre message :\n\n{reponse_texte}\n\nCordialement,\nL'équipe Allen Smith Group"
-            mail.send(msg_reponse)
-            reponse_envoye = True
-        except Exception as e:
-            print(f"Erreur lors de l'envoi de la réponse : {e}")
-            reponse_envoye = False
+        # ✅ ENVOI DE LA RÉPONSE EN TÂCHE DE FOND
+        def send_reply_background():
+            try:
+                msg_reponse = MailMessage(
+                    subject='Réponse de Allen Smith Group',
+                    sender=app.config['MAIL_DEFAULT_SENDER'],
+                    recipients=[msg.email]
+                )
+                msg_reponse.body = f"Bonjour {msg.nom},\n\nVoici la réponse de l'équipe Allen Smith Group à votre message :\n\n{reponse_texte}\n\nCordialement,\nL'équipe Allen Smith Group"
+                mail.send(msg_reponse)
+            except Exception as e:
+                print(f"⚠️ Erreur lors de l'envoi de la réponse : {e}")
+
+        threading.Thread(target=send_reply_background).start()
         
-        return render_template('view_message.html', titre=f"Message de {msg.nom}", message=msg, reponse_envoye=reponse_envoye)
+        return render_template('view_message.html', titre=f"Message de {msg.nom}", message=msg, reponse_envoye=True)
     
     return render_template('view_message.html', titre=f"Message de {msg.nom}", message=msg)
 
