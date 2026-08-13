@@ -131,7 +131,7 @@ def merci():
 
 @app.route('/blog')
 def blog():
-    articles = Article.query.order_by(Article.date.desc()).all()
+    articles = Article.query.order_by(Article.date.desc()).limit(10).all()
     return render_template('blog.html', titre="Actualités - Allen Smith Group", articles=articles, meta_description="Suivez les dernières actualités et innovations d'Allen Smith Group.")
 
 @app.route('/article/<int:id>')
@@ -187,7 +187,7 @@ def admin():
         return redirect(url_for('login'))
     
     messages = Message.query.order_by(Message.date.desc()).all()
-    articles = Article.query.order_by(Article.date.desc()).all()
+    articles = Article.query.order_by(Article.date.desc()).limit(10).all()
     medias = Media.query.order_by(Media.date.desc()).all()
     total_connexions = ClientLog.query.count()
     dernieres_connexions = ClientLog.query.order_by(ClientLog.date_connexion.desc()).limit(5).all()
