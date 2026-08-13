@@ -1,4 +1,5 @@
 import os
+import shutil  # <-- AJOUT POUR SUPPRIMER LES DOSSIERS
 from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message as MailMessage
@@ -72,12 +73,18 @@ class ClientLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date_connexion = db.Column(db.DateTime, default=datetime.utcnow)
 
-# ✅ SCRIPT DE NETTOYAGE AGRESSIF AU DÉMARRAGE
+# ✅ SCRIPT DE NETTOYAGE ULTIME AU DÉMARRAGE
 with app.app_context():
     # On supprime le fichier de la base de données s'il existe
     if os.path.exists('site.db'):
         os.remove('site.db')
         print("🔴 Ancienne base de données supprimée avec succès !")
+    
+    # On supprime le dossier cache Python s'il existe
+    if os.path.exists('__pycache__'):
+        shutil.rmtree('__pycache__')
+        print("🔴 Cache Python supprimé avec succès !")
+    
     # On recrée la base avec toutes les colonnes
     db.create_all()
     print("🟢 Nouvelle base de données créée avec succès !")
@@ -188,7 +195,7 @@ def admin():
     
     messages = Message.query.order_by(Message.date.desc()).all()
     articles = Article.query.order_by(Article.date.desc()).limit(10).all()
-    medias = Media.query.order_by(Media.date.desc()).all()
+    medias = Media.query.order_by(Media.date.desc()).limit(10).all()
     total_connexions = ClientLog.query.count()
     dernieres_connexions = ClientLog.query.order_by(ClientLog.date_connexion.desc()).limit(5).all()
     unread_count = Message.query.filter_by(statut="Non lu").count()
@@ -241,7 +248,7 @@ def view_message(id):
         msg.statut = "✅ Traité"
         db.session.commit()
         
-        # ✅ NOUVEAU : ENVOI DE L'EMAIL DE RÉPONSE AU CLIENT
+        # ✅ ENVOI DE L'EMAIL DE RÉPONSE AU CLIENT
         try:
             msg_reponse = MailMessage(
                 subject='Réponse de Allen Smith Group',
