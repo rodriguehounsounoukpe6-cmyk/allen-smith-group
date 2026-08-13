@@ -20,36 +20,41 @@
             
             {% if messages %}
                 <h4>Messages trouvés :</h4>
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Message</th>
-                                <th>Statut</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for msg in messages %}
-                            <tr>
-                                <td>{{ msg.date.strftime('%d/%m/%Y %H:%M') }}</td>
-                                <td>{{ msg.contenu }}</td>
-                                <td>
-                                    {% if msg.statut == "Non lu" %}
-                                        <span class="badge bg-danger">En attente</span>
-                                    {% elif msg.statut == "En cours" %}
-                                        <span class="badge bg-warning text-dark">Lecture</span>
-                                    {% elif msg.statut == "✅ Traité" %}
-                                        <span class="badge bg-success">Traité</span>
-                                    {% else %}
-                                        <span class="badge bg-secondary">{{ msg.statut }}</span>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                {% for msg in messages %}
+                    <div class="card mb-3">
+                        <div class="card-header bg-primary text-white">
+                            <strong>Vous</strong> - {{ msg.date.strftime('%d/%m/%Y à %H:%M') }}
+                        </div>
+                        <div class="card-body">
+                            <p>{{ msg.contenu }}</p>
+                            
+                            <!-- ✅ NOUVEAU : Affichage des réponses de l'Admin -->
+                            {% if msg.replies %}
+                                <hr>
+                                <h6 class="text-success">✅ Réponse de Allen Smith Group :</h6>
+                                {% for reply in msg.replies %}
+                                    <div class="alert alert-success">
+                                        <small class="text-muted">{{ reply.date.strftime('%d/%m/%Y à %H:%M') }}</small>
+                                        <p class="mb-0">{{ reply.contenu }}</p>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                            
+                            <small class="text-muted">
+                                Statut : 
+                                {% if msg.statut == "Non lu" %}
+                                    <span class="badge bg-danger">En attente</span>
+                                {% elif msg.statut == "En cours" %}
+                                    <span class="badge bg-warning text-dark">Lecture</span>
+                                {% elif msg.statut == "✅ Traité" %}
+                                    <span class="badge bg-success">Traité</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ msg.statut }}</span>
+                                {% endif %}
+                            </small>
+                        </div>
+                    </div>
+                {% endfor %}
             {% elif request.args.get('email') %}
                 <div class="alert alert-warning">Aucun message trouvé pour cet email.</div>
             {% endif %}

@@ -1,6 +1,6 @@
 import os
 import shutil
-import threading  # <-- AJOUT IMPORTANT
+import threading
 from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message as MailMessage
@@ -47,6 +47,16 @@ class Message(db.Model):
     date = db.Column(db.DateTime, default=datetime.utcnow)
     statut = db.Column(db.String(20), default="Non lu")
     client_id = db.Column(db.String(100), nullable=True)
+
+# ✅ NOUVEAU : Table pour stocker les réponses de l'Admin
+class Reply(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    message_id = db.Column(db.Integer, db.ForeignKey('message.id'), nullable=False)
+    contenu = db.Column(db.Text, nullable=False)
+    date = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relation pour faciliter l'accès
+    message = db.relationship('Message', backref=db.backref('replies', lazy=True))
 
 class Article(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -127,10 +137,8 @@ def contact():
             except Exception as e:
                 print(f"⚠️ Erreur SMTP en arrière-plan : {e}")
 
-        # Lance l'email dans un thread séparé
         threading.Thread(target=send_email_background).start()
 
-        # La redirection vers Merci est INSTANTANÉE
         return redirect(url_for('merci', nom=nom))
  
     return render_template('contact.html', titre="Contact - Allen Smith Group", meta_description="Contactez Allen Smith Group pour vos projets web et technologiques.")
@@ -263,6 +271,11 @@ def view_message(id):
     if request.method == 'POST':
         reponse_texte = request.form.get('reponse')
         msg.statut = "✅ Traité"
+        db.session.commit()
+        
+        # ✅ ENREGISTRER LA RÉPONSE DANS LA BASE DE DONNÉES
+        nouvelle_reponse = Reply(message_id=msg.id, contenu=reponse_texte)
+        db.session.add(nouvelle_reponse)
         db.session.commit()
         
         # ✅ ENVOI DE LA RÉPONSE EN TÂCHE DE FOND
