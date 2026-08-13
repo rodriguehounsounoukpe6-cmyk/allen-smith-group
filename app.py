@@ -20,12 +20,14 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = os.environ.get('SECRET_KEY', 'une_cle_tres_secrete_et_compliquee_a_changer')
 
 # CONFIGURATION EMAIL (Forçage de la langue FR pour les emails)
-app.config['MAIL_SERVER'] = 'smtp.mailgun.org'     # ✅ CHANGEMENT ICI (Mailgun)
+app.config['MAIL_SERVER'] = 'smtp.mailgun.org'     
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', 'votre.email@gmail.com')
 app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'votre_mot_de_passe_app')
 app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_USERNAME', 'votre.email@gmail.com')
+# ✅ TIMEOUT PLACÉ ICI (AVANT L'INITIALISATION DE MAIL)
+app.config['MAIL_TIMEOUT'] = 5
 
 # --- Configuration Cloudinary ---
 cloudinary.config(
@@ -114,16 +116,14 @@ def contact():
         db.session.commit()
 
         try:
-            # --- AJOUT DU TIMEOUT POUR ÉVITER LE BLOCAGE ---
-            app.config['MAIL_TIMEOUT'] = 5  # 5 secondes max
-            
+            # ✅ PLUS BESOIN DE REDÉFINIR LE TIMEOUT ICI
             msg = MailMessage(
                 subject='Nouveau message sur Allen Smith Group',
                 sender=app.config['MAIL_DEFAULT_SENDER'],
                 recipients=[app.config['MAIL_DEFAULT_SENDER']]
             )
             msg.body = f"Vous avez reçu un message de {nom} ({email}).\n\nMessage :\n{message_texte}"
-            mail.send(msg)  # Cette ligne va maintenant échouer proprement après 5 secondes
+            mail.send(msg) 
         except Exception as e:
             # On ignore l'erreur pour que la redirection fonctionne
             print(f"⚠️ Erreur SMTP (ignore) : {e}")
