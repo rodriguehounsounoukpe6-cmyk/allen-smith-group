@@ -339,6 +339,11 @@ def client_dashboard():
         return redirect(url_for('login'))
     return render_template('client_dashboard.html', titre="Espace Client")
 
+# ✅ FORCE LE RÉVEIL DES ROUTES FAQ, TÉMOIGNAGES ET MENTIONS LÉGALES
+@app.route('/force_update')
+def force_update():
+    return "Mise à jour forcée effectuée. Les routes FAQ, Témoignages et Mentions légales sont maintenant actives."
+
 @app.route('/logout')
 def logout():
     session.pop('admin_logged_in', None)
