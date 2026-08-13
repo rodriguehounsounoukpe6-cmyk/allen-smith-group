@@ -20,7 +20,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = os.environ.get('SECRET_KEY', 'une_cle_tres_secrete_et_compliquee_a_changer')
 
 # CONFIGURATION EMAIL (Forçage de la langue FR pour les emails)
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_SERVER'] = 'smtp.mailgun.org'     # ✅ CHANGEMENT ICI (Mailgun)
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', 'votre.email@gmail.com')
@@ -114,16 +114,21 @@ def contact():
         db.session.commit()
 
         try:
+            # --- AJOUT DU TIMEOUT POUR ÉVITER LE BLOCAGE ---
+            app.config['MAIL_TIMEOUT'] = 5  # 5 secondes max
+            
             msg = MailMessage(
                 subject='Nouveau message sur Allen Smith Group',
                 sender=app.config['MAIL_DEFAULT_SENDER'],
                 recipients=[app.config['MAIL_DEFAULT_SENDER']]
             )
             msg.body = f"Vous avez reçu un message de {nom} ({email}).\n\nMessage :\n{message_texte}"
-            mail.send(msg)
+            mail.send(msg)  # Cette ligne va maintenant échouer proprement après 5 secondes
         except Exception as e:
-            print(f"Erreur lors de l'envoi de l'email : {e}")
+            # On ignore l'erreur pour que la redirection fonctionne
+            print(f"⚠️ Erreur SMTP (ignore) : {e}")
 
+        # La redirection fonctionnera toujours, même si l'email échoue
         return redirect(url_for('merci', nom=nom))
  
     return render_template('contact.html', titre="Contact - Allen Smith Group", meta_description="Contactez Allen Smith Group pour vos projets web et technologiques.")
