@@ -1,5 +1,5 @@
 import os
-import shutil  # <-- AJOUT POUR SUPPRIMER LES DOSSIERS
+import shutil
 from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message as MailMessage
@@ -75,17 +75,14 @@ class ClientLog(db.Model):
 
 # ✅ SCRIPT DE NETTOYAGE ULTIME AU DÉMARRAGE
 with app.app_context():
-    # On supprime le fichier de la base de données s'il existe
     if os.path.exists('site.db'):
         os.remove('site.db')
         print("🔴 Ancienne base de données supprimée avec succès !")
     
-    # On supprime le dossier cache Python s'il existe
     if os.path.exists('__pycache__'):
         shutil.rmtree('__pycache__')
         print("🔴 Cache Python supprimé avec succès !")
     
-    # On recrée la base avec toutes les colonnes
     db.create_all()
     print("🟢 Nouvelle base de données créée avec succès !")
 
@@ -158,6 +155,19 @@ def page_not_found(e):
 @app.route('/download/<filename>')
 def download_file(filename):
     return send_from_directory('static', filename)
+
+# ✅ ROUTES MANQUANTES AJOUTÉES ICI
+@app.route('/legal')
+def legal():
+    return render_template('legal.html', titre="Mentions légales")
+
+@app.route('/faq')
+def faq():
+    return render_template('faq.html', titre="FAQ")
+
+@app.route('/testimonials')
+def testimonials():
+    return render_template('testimonials.html', titre="Témoignages")
 
 # --- PARTIE CONNEXION UNIQUE ---
 ADMIN_PASSWORD = "Allen2026" 
@@ -248,12 +258,11 @@ def view_message(id):
         msg.statut = "✅ Traité"
         db.session.commit()
         
-        # ✅ ENVOI DE L'EMAIL DE RÉPONSE AU CLIENT
         try:
             msg_reponse = MailMessage(
                 subject='Réponse de Allen Smith Group',
                 sender=app.config['MAIL_DEFAULT_SENDER'],
-                recipients=[msg.email]  # Envoi au client qui a posé la question
+                recipients=[msg.email]
             )
             msg_reponse.body = f"Bonjour {msg.nom},\n\nVoici la réponse de l'équipe Allen Smith Group à votre message :\n\n{reponse_texte}\n\nCordialement,\nL'équipe Allen Smith Group"
             mail.send(msg_reponse)
@@ -339,7 +348,6 @@ def client_dashboard():
         return redirect(url_for('login'))
     return render_template('client_dashboard.html', titre="Espace Client")
 
-# ✅ FORCE LE RÉVEIL DES ROUTES FAQ, TÉMOIGNAGES ET MENTIONS LÉGALES
 @app.route('/force_update')
 def force_update():
     return "Mise à jour forcée effectuée. Les routes FAQ, Témoignages et Mentions légales sont maintenant actives."
